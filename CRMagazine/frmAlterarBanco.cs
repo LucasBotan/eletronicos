@@ -24,7 +24,7 @@ namespace CRMagazine
 
         private void frmAlterarBanco_Load(object sender, EventArgs e)
         {
-
+            consulta.ListarVarejistas(cboVarejista);
         }
 
       

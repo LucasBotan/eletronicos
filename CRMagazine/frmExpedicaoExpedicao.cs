@@ -140,7 +140,7 @@ namespace CRMagazine
                 txtVarejista.Text = consulta.Varejista;
                 txtID.Text = consulta.idChamados;
 
-                if(lblCT.Text != "101") // verificar essa lógiaca ao testar
+                if(lblCT.Text != "10_1") // verificar essa lógiaca ao testar
                 {
                     BuscarNFparaConsulta();
                 }
@@ -149,7 +149,7 @@ namespace CRMagazine
                     txtNF.Text = "0";
                 }
                 
-                if (txtNF.Text != "0" && txtNF.Text.Length > 0 || lblCT.Text == "101") // verificar essa lógiaca ao testar
+                if (txtNF.Text != "0" && txtNF.Text.Length > 0 || lblCT.Text == "10_1") // verificar essa lógiaca ao testar
                 {
                     if (MessageBox.Show("CONCLUIR? ", "Pergunta", MessageBoxButtons.YesNo) == DialogResult.Yes)
                     {                        
@@ -170,7 +170,7 @@ namespace CRMagazine
                         // ==============================================================================
                         if (consulta.LinhasAfetadas > 0)
                         {
-                            if (lblCT.Text != "101") // verificar essa lógiaca ao testar
+                            if (lblCT.Text != "10_1") // verificar essa lógiaca ao testar
                             {
                                 BaixarQntNF();
                             }

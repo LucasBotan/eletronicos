@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Drawing.Printing;
 using System.Media;
 using System.IO;
+using System.Data;
 
 namespace CRMagazine
 {
@@ -491,6 +492,33 @@ namespace CRMagazine
                 MessageBox.Show("Falha em Consulta USUARIOS: \n" + x.Message);
             }
             cx.Desconectar();
+        }
+
+        public void ListarVarejistas(ComboBox comboBox)
+        {
+            try
+            {
+                // Lógica para preencher o ComboBox com os varejistas
+                SqlDataAdapter da;
+                DataSet ds = new DataSet();
+                string sql = "SELECT Item FROM CheckListGeral WHERE TipoEquip = 'VAREJISTA' ORDER BY Item ASC";
+                cx.Conectar();
+                da = new SqlDataAdapter(sql, cx.c);
+                cx.Desconectar();
+                da.Fill(ds, "CheckListGeral");
+                comboBox.ValueMember = "Item";
+                comboBox.DisplayMember = "Item";
+                comboBox.DataSource = ds.Tables["CheckListGeral"];
+                comboBox.Text = null;
+            }
+            catch (Exception x)
+            {
+                MessageBox.Show(x.Message);
+            }
+            finally
+            {
+                cx.Desconectar();
+            }
         }
 
         public void consultarUsuario(string Usuario, string CTDesejado)
@@ -1318,7 +1346,7 @@ namespace CRMagazine
 
                // if (cont is MaskedTextBox) { (cont as MaskedTextBox).Text = ""; }
 
-                if ((cont is RadioButton) && (cont as RadioButton).Name != "rbt200dpi" && (cont as RadioButton).Name != "rbt300dpi" && (cont as RadioButton).Name != "rbt600dpi" && (cont as RadioButton).Name != "rbt110" && (cont as RadioButton).Name != "rbt220" && (cont as RadioButton).Name != "rbtBIv")
+                if ((cont is RadioButton) && (cont as RadioButton).Name != "rbt200dpi" && (cont as RadioButton).Name != "rbt300dpi" && (cont as RadioButton).Name != "rbt600dpi" && (cont as RadioButton).Name != "rbt110" && (cont as RadioButton).Name != "rbt220" && (cont as RadioButton).Name != "rbtBIv" && (cont as RadioButton).Name != "rbtDevolucao" && (cont as RadioButton).Name != "rbtSucata")
                 {                     
                     (cont as RadioButton).Checked = false;
                 }

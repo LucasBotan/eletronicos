@@ -28,6 +28,7 @@ namespace CRMagazine
         private void frmEntradaDeNotas_Load(object sender, EventArgs e)
         {
             FormatarGridTeste();
+            consultar.ListarVarejistas(cboVarejista);
         }
 
         private void btnSelecionar_Click(object sender, EventArgs e)
@@ -627,7 +628,7 @@ namespace CRMagazine
                 txtChave.Text = "";
                 txtNota.Text = "";
                 txtSerie.Text = "";
-                cboVarejista.Text = "";
+                //cboVarejista.Text = "";
                 btnEntrada.Visible = false;
             }          
             

@@ -21,6 +21,7 @@ namespace CRMagazine
 
         private void frmInserirModelo_Load(object sender, EventArgs e)
         {
+            consultar.ListarVarejistas(cboVarejista);
             txtCodVarejo.Select();
         }
 

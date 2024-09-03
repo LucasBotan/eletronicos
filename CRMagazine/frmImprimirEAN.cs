@@ -28,6 +28,7 @@ namespace CRMagazine
         {
             txtBusca.Select();            
             rbt220.Checked = true;
+            consulta.ListarVarejistas(cboVarejista);
             cboVarejista.Text = "VIAVAREJO";
             cboBusca.Text = "CÓDIGO VAREJO";
         }

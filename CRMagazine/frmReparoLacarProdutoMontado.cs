@@ -24,6 +24,7 @@ namespace CRMagazine
 
         private void frmReparoLacarProdutoMontado_Load(object sender, EventArgs e)
         {
+            consulta.ListarVarejistas(cboVarejista);
             PreencherComboboxStatus();
             cboVarejista.Text = "VIAVAREJO";
             cboBusca.Text = "EAN";

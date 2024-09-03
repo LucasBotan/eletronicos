@@ -106,7 +106,7 @@ namespace CRMagazine
             SqlDataAdapter da;
             DataSet ds = new DataSet();
             string sql = "";
-            sql += " Select DISTINCT TipoEquip from CheckListGeral";
+            sql += " Select DISTINCT TipoEquip from CheckListGeral WHERE TipoEquip != 'VAREJISTA'";
             cx.Conectar();
             da = new SqlDataAdapter(sql, cx.c);
             da.Fill(ds, "CheckListGeral");

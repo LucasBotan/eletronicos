@@ -199,8 +199,8 @@ namespace CRMagazine
             sql += "COUNT(C.CodVarejo) as QNT, CONVERT(FLOAT,N.Valor_uni) AS Valor_uni, ";
            // sql += " COUNT(C.CodVarejo) * CONVERT(FLOAT,N.Valor_uni) AS	VALOR_TOTAL ,N.NCM from Chamados C, NotaFiscal N ";
             sql += "replace(COUNT(C.CodVarejo) * CONVERT(NUMERIC(10,2),N.Valor_uni), '.', ',') AS VALOR_TOTAL ,N.NCM from Chamados C, NotaFiscal N ";
-            sql += " where C.NotaFiscal = N.NotaFiscal and C.CodVarejo = N.CodVarejo and NotaFiscalSaida = 'PENDENTE' and C.CT = '" + lblCT.Text + "'";
-            sql += " AND Status = 'FINALIZADO' and C.NotaFiscal = '" + NF + "' and C.Varejista = '" + txtVarejista.Text + "' and ";
+            sql += " where C.NotaFiscal = N.NotaFiscal and C.CodVarejo = N.CodVarejo and C.CT = N.CT and NotaFiscalSaida = 'PENDENTE' "; 
+            sql += " AND Status = 'FINALIZADO' and C.NotaFiscal = '" + NF + "' and C.Varejista = '" + txtVarejista.Text + "' and C.CT = '" + lblCT.Text + "' and ";
             if (txtOrcamento.Text == "NOVO")
             {
                 sql += "Classificacao in ('ORCAMENTO', 'GARANTIA') ";

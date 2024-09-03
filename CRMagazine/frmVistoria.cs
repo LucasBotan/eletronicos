@@ -38,6 +38,7 @@ namespace CRMagazine
             PreencherComboboxVarejista();           
             ContadorDeProducao();
             chbIrParaReparo.Checked = false;
+            consulta.ListarVarejistas(cboVarejista);
         }
 
 
@@ -250,7 +251,7 @@ namespace CRMagazine
                     consulta.comando = "";
                     consulta.comando = "SELECT count(NotaFiscal) as Quantidade FROM NotaFiscal where idNotaFiscal = (select top 1 idNotaFiscal from NotaFiscal where CodVarejo = '" + txtCodVarejo.Text + "' and QntRestanteEnt > 0 and Varejista = '" + cboVarejista.Text + "' and CT = '" + lblCT.Text + "')";
                     consulta.consultarSimNao();
-                    if (Convert.ToInt32(consulta.qntNaPosicao) > 0 || lblCT.Text == "101")
+                    if (Convert.ToInt32(consulta.qntNaPosicao) > 0 || lblCT.Text == "10_1")
                     {
                          txtNS.Select();
                     }
@@ -842,7 +843,7 @@ namespace CRMagazine
                 consulta.comando = "";
                 consulta.comando = "SELECT count(NotaFiscal) as Quantidade FROM NotaFiscal where idNotaFiscal = (select top 1 idNotaFiscal from NotaFiscal where CodVarejo = '" + txtCodVarejo.Text + "' and QntRestanteEnt > 0 and Varejista = '" + cboVarejista.Text + "' and CT = '" + lblCT.Text + "')";
                 consulta.consultarSimNao();
-                if (Convert.ToInt32(consulta.qntNaPosicao) > 0 || lblCT.Text == "101")
+                if (Convert.ToInt32(consulta.qntNaPosicao) > 0 || lblCT.Text == "10_1")
                 {
                     Concluir();
                     if (consulta.Retorno == "ok")
@@ -863,7 +864,7 @@ namespace CRMagazine
                          */
 
                         //EXEMPLO que é para dar certo --> é só revisar
-                        if(lblCT.Text != "101")
+                        if(lblCT.Text != "10_1")
                         {
                             consulta.comando = "";
                             consulta.comando = "update NotaFiscal set QntRestanteEnt = QntRestanteEnt - 1 where idNotaFiscal = (select top 1 idNotaFiscal from NotaFiscal where CodVarejo = '" + txtCodVarejo.Text + "' and QntRestanteEnt > 0 and Varejista = '" + cboVarejista.Text + "' and CT = '" + lblCT.Text + "' order by CONVERT(date, Data, 103) ASC) ";
@@ -973,7 +974,9 @@ namespace CRMagazine
                 MessageBox.Show(x.Message);
             }
 
-            if(cboVarejista.Text == "VIAVAREJO" || cboVarejista.Text == "MULTIVAREJO" || cboVarejista.Text == "CNOVA" || cboVarejista.Text == "MAGAZINE")
+
+            consulta.InsereNoBanco(txtOS.Text, txtCodVarejo.Text, txtDescricao.Text, txtSKU.Text, consulta.data, "REPARO", txtTipo.Text, cboVarejista.Text, txtNS.Text, cboFuncEst.Text + " / " + txtDefeitoRelatado.Text, txtFilial.Text, DataGaiola, lblCT.Text);
+            /*if (cboVarejista.Text == "VIAVAREJO" || cboVarejista.Text == "MULTIVAREJO" || cboVarejista.Text == "CNOVA" || cboVarejista.Text == "MAGAZINE")
             {
                 consulta.InsereNoBanco(txtOS.Text, txtCodVarejo.Text, txtDescricao.Text, txtSKU.Text, consulta.data, "REPARO", txtTipo.Text, cboVarejista.Text, txtNS.Text, cboFuncEst.Text + " / " + txtDefeitoRelatado.Text, txtFilial.Text, DataGaiola, lblCT.Text);
             }
@@ -981,7 +984,7 @@ namespace CRMagazine
             {
                 //SE FOR OUTROS VAREJISTAS VAI GERAR A OS AUTOMATICAMENTE
                  consulta.InsereNoBancoOutros(txtCodVarejo.Text, txtDescricao.Text, txtSKU.Text, consulta.data, "REPARO", txtTipo.Text, cboVarejista.Text, txtNS.Text, cboFuncEst.Text + " / " + txtDefeitoRelatado.Text, txtFilial.Text, DataGaiola, lblCT.Text);
-            }
+            }*/
             
            
 
@@ -1169,10 +1172,10 @@ namespace CRMagazine
             consulta.LimparControles(this);
             ContadorDeProducao();
             txtOS.Select();
-            if (cboVarejista.Text != "VIAVAREJO" && cboVarejista.Text != "CNOVA" && cboVarejista.Text != "MULTIVAREJO" && cboVarejista.Text != "MAGAZINE")
+            /*if (cboVarejista.Text != "VIAVAREJO" && cboVarejista.Text != "CNOVA" && cboVarejista.Text != "MULTIVAREJO" && cboVarejista.Text != "MAGAZINE")
             {
                 txtOS.Text = "JBINFO";
-            }
+            }*/
         }
 
 
@@ -1656,7 +1659,7 @@ namespace CRMagazine
 
         private void cboVarejista_SelectedValueChanged(object sender, EventArgs e)
         {
-            if (cboVarejista.Text != "VIAVAREJO" && cboVarejista.Text != "CNOVA" && cboVarejista.Text != "MULTIVAREJO" && cboVarejista.Text != "MAGAZINE")
+            /*if (cboVarejista.Text != "VIAVAREJO" && cboVarejista.Text != "CNOVA" && cboVarejista.Text != "MULTIVAREJO" && cboVarejista.Text != "MAGAZINE")
             {
                 txtOS.Text = "JBINFO";
                 txtOS.Select();
@@ -1665,7 +1668,9 @@ namespace CRMagazine
             {
                 txtOS.Text = "";
                 txtOS.Select();
-            }
+            }*/
+            txtOS.Text = "";
+            txtOS.Select();
         }
 
         

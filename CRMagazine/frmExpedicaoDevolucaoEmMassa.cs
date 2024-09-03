@@ -26,6 +26,7 @@ namespace CRMagazine
         private void frmExpedicaoDevolucaoEmMassa_Load(object sender, EventArgs e)
         {
             FormatarGridTeste();
+            consulta.ListarVarejistas(cboVarejista);
             txtCodVarejo.Select();
         }
 
