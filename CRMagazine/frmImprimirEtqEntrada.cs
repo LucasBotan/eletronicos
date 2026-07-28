@@ -96,9 +96,9 @@ namespace CRMagazine
         }
 
         public void Imprimir()
-        {      
+        {
 
-            imprimir.EtiquetaEntrada(txtOS.Text, txtDataEntrada.Text, txtData30.Text);
+            imprimir.EtiquetaEntrada(txtOS.Text, txtDataEntrada.Text, consulta.Varejista, txtDescricao.Text) ; // txtData30.Text);
 
             string codZPL = imprimir.s;
 

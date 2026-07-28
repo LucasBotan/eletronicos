@@ -628,7 +628,7 @@ namespace CRMagazine
         }
         
 
-        public void InsereNoBanco(
+        public int InsereNoBanco(
             string OS,
             string CodVarejo,
             string Descricao,
@@ -646,10 +646,11 @@ namespace CRMagazine
             )
         {
             Retorno = "";
+            int linhasAfetadas = 0;
             string sql = "";
             try
             {
-                sql += "IF NOT EXISTS (select * from Chamados where OS = '" + Prevent(OS) + "') BEGIN ";
+                sql += "IF NOT EXISTS (select * from Chamados where OS = '" + Prevent(OS) + "' and CT = '" + CT + "') BEGIN ";
                 sql += "insert into Chamados (OS, CodVarejo, Descricao, SKU, DataEntrada, Status, TipoEquip, Varejista, NS, DefeitoRelatado, Filial, DataGaiola, CT) values ";  
                 sql += "(";
                 sql += "'" + OS + "', ";
@@ -671,19 +672,25 @@ namespace CRMagazine
                 SqlCommand cd = new SqlCommand();
                 cd.Connection = cx.c;
                 cd.CommandText = ComandPrevent(sql);
-                cd.ExecuteNonQuery();
+                //cd.ExecuteNonQuery();
+                linhasAfetadas = cd.ExecuteNonQuery();
                 Retorno = "ok";
+                return linhasAfetadas;
             }
             catch (Exception x)
             {
-                MessageBox.Show("ERRO AO INSERIR NO BANCO CHAMADOS: \n" + x.Message);
+                MessageBox.Show("ERRO AO INSERIR NO BANCO CHAMADOS: \n" + x.Message);                
                 Retorno = "falha";
+                return linhasAfetadas;
             }
-            cx.Desconectar();
+            finally
+            {
+                cx.Desconectar();
+            }            
         }
 
         public string OSoutros = "";
-        public void InsereNoBancoOutros(
+        public int InsereNoBancoOutros(
             //string OS,
             string CodVarejo,
             string Descricao,
@@ -702,14 +709,15 @@ namespace CRMagazine
             OSoutros = "";
             Retorno = "";
             string sql = "";
+            int linhasAfetadas = 0;
             int id = 0;
             
             try
             {
-                sql += "IF NOT EXISTS (select * from Chamados where OS = (select 'JB' + convert(varchar(15),(MAX(idChamados)+1)) from Chamados)) BEGIN ";
+                sql += "IF NOT EXISTS (select * from Chamados where OS = (select 'BS' + convert(varchar(15),(MAX(idChamados)+1)) from Chamados)) BEGIN ";
                 sql += "insert into Chamados (OS, CodVarejo, Descricao, SKU, DataEntrada, Status, TipoEquip, Varejista, NS, DefeitoRelatado, Filial, DataGaiola, CT) ";
                 sql += "(";
-                sql += "select 'JB' + convert(varchar(15),(MAX(idChamados)+1)), ";
+                sql += "select 'BS' + convert(varchar(15),(MAX(idChamados)+1)), ";
                 sql += "'" + CodVarejo + "', ";
                 sql += "'" + Descricao + "', ";
                 sql += "'" + SKU + "', ";
@@ -727,22 +735,28 @@ namespace CRMagazine
                 SqlCommand cd = new SqlCommand();
                 cd.Connection = cx.c;
                 cd.CommandText = ComandPrevent(sql);
-                cd.ExecuteNonQuery();
+                //cd.ExecuteNonQuery();
+                linhasAfetadas = cd.ExecuteNonQuery();
 
                 cd.CommandText = "SELECT SCOPE_IDENTITY()";
                 id = Convert.ToInt32(cd.ExecuteScalar());
 
                 // OS GERADA NO CHAMADOS PARA INSERIR NO HISTORICO
-                OSoutros = "JB" + id;
+                OSoutros = "BS" + id;
 
                 Retorno = "ok";
+                return linhasAfetadas;
             }
             catch (Exception x)
             {
                 MessageBox.Show("ERRO AO INSERIR NO BANCO CHAMADOS USANDO OUTROS VAREJISTAS: \n" + x.Message);
                 Retorno = "falha";
+                return linhasAfetadas;
             }
-            cx.Desconectar();           
+            finally
+            {
+                cx.Desconectar();
+            }                    
         }
 
 
@@ -1351,7 +1365,16 @@ namespace CRMagazine
                     (cont as RadioButton).Checked = false;
                 }
 
-                if ((cont is CheckBox) && (cont as CheckBox).Name != "chbSelecionarImpressora" && (cont as CheckBox).Name != "chbNaoImprimir" && (cont as CheckBox).Name != "chbSemConexao" && (cont as CheckBox).Name != "chbSemZebra" && (cont as CheckBox).Name != "chbIrParaReparo" && (cont as CheckBox).Name != "chbSemA1" && (cont as CheckBox).Name != "chbConfigImpressora")
+                if ((cont is CheckBox) 
+                    && (cont as CheckBox).Name != "chbSelecionarImpressora"
+                    && (cont as CheckBox).Name != "chbNaoImprimir"
+                    && (cont as CheckBox).Name != "chbSemConexao" 
+                    && (cont as CheckBox).Name != "chbSemZebra" 
+                    && (cont as CheckBox).Name != "chbIrParaReparo" 
+                    && (cont as CheckBox).Name != "chbSemA1" 
+                    && (cont as CheckBox).Name != "chbConfigImpressora" 
+                    && (cont as CheckBox).Name != "chbManterOsZeros"
+                    )
                 { 
                     (cont as CheckBox).Checked = false;
                 }

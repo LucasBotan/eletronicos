@@ -63,7 +63,7 @@ namespace CRMagazine
         public string ChamadoPai = "";
 
 
-        public void EtiquetaEntrada(string OS, string Entrada, string Mais30)
+        public void EtiquetaEntrada(string OS, string Entrada, string varejista, string modelo)//, string Mais30)
         {
             s = "";
             s += "^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR3,3^MD12^JUS^LRN^CI0^XZ";
@@ -73,7 +73,17 @@ namespace CRMagazine
             s += "^LL680";
             s += "^LS0";
             s += "^SD20";
-            s += "";
+
+            s += $"^BY3,2,80^FT 90,120^BCN,,N,N^FD{OS}^FS";
+            s += $"^FT90,180^A0N,70,80^FH\\^FD{OS}^FS";
+            s += $"^FT100,230^A0N,40,50^FH\\^FDENTRADA: {Entrada}^FS";
+            s += "^FT100,260^A0N,20,20^FH\\^FDVAREJISTA:^FS";
+            s += $"^FT100,300^A0N,40,50^FH\\^FD{varejista}^FS";
+            s += $"^FO40,320^FB760,3,0,C,0^AON,25,15^FD{modelo}^FS";
+            s += "^PQ1,0,1,Y^XZ";
+
+            //ANTES
+            /*s += "";
             s += "^BY3,2,80^FT 90,120^BCN,,N,N^FD" + OS + "^FS";
             s += "^FT90,180^A0N,70,80^FH\\^FD" + OS + "^FS";
             s += "";
@@ -87,7 +97,7 @@ namespace CRMagazine
             s += "^FO500,250^FR^AC,40,20^FDDT LIMITE^FS";
             s += "^FO480,300^FR^AC,80,22^FD" + Mais30 + "^FS";
             s += "";
-            s += "^PQ1,0,1,Y^XZ";
+            s += "^PQ1,0,1,Y^XZ";*/
         }
 
         public void EtiquetaEANPuri(string Voltagem, string CodVarejo, string SKU, string EAN, string Descricao)

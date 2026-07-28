@@ -38,8 +38,10 @@ namespace CRMagazine
             PreencherComboboxVarejista();           
             ContadorDeProducao();
             chbIrParaReparo.Checked = false;
-            consulta.ListarVarejistas(cboVarejista);
+            //consulta.ListarVarejistas(cboVarejista);
+            ListarVarejistasEspecial();
         }
+
 
 
         Consulta consulta = new Consulta();
@@ -74,6 +76,64 @@ namespace CRMagazine
                 //================================================                
             }
 
+        }
+
+        bool listarVarejista = false;
+        public void ListarVarejistasEspecial()
+        {
+            SqlDataAdapter da;
+            DataSet ds = new DataSet();
+            string sql = "";
+            //string sql = "SELECT Item FROM CheckListGeral WHERE TipoEquip = 'VAREJISTA' ORDER BY Item ASC";
+            sql += " Select Especie, Item from CheckListGeral where TipoEquip = 'VAREJISTA' order by Item asc";
+            // sql += " Order by  Categoria ";
+            cx.Conectar();
+            da = new SqlDataAdapter(sql, cx.c);
+            cx.Desconectar();
+            da.Fill(ds, "CheckListGeral");
+            List<KeyValuePair<string, string>> items = new List<KeyValuePair<string, string>>();
+            foreach (DataRow row in ds.Tables["CheckListGeral"].Rows)
+            {
+                string evento = row["Especie"].ToString();
+                string varejista = row["Item"].ToString();
+                items.Add(new KeyValuePair<string, string>(evento, varejista));
+            }
+            cboVarejista.ValueMember = "Key";
+            cboVarejista.DisplayMember = "Value";
+            cboVarejista.DataSource = items;
+            cboVarejista.Text = null;
+            listarVarejista = true;          
+       
+        }
+
+
+        private void cboVarejista_SelectedValueChanged(object sender, EventArgs e)
+        {
+            /*if (cboVarejista.Text != "VIAVAREJO" && cboVarejista.Text != "CNOVA" && cboVarejista.Text != "MULTIVAREJO" && cboVarejista.Text != "MAGAZINE")
+            {
+                txtOS.Text = "BSOFT";
+                txtOS.Select();
+            }
+            else
+            {
+                txtOS.Text = "";
+                txtOS.Select();
+            }*/
+            if (listarVarejista == true)
+            {
+                if (cboVarejista.SelectedValue.ToString() != "OS_PROPRIA")
+                {
+                    txtOS.Text = "BSOFT";
+                    txtOS.Select();
+                }
+                else
+                {
+                    txtOS.Text = "";
+                    txtOS.Select();
+                }
+            }
+
+            
         }
 
 
@@ -230,7 +290,10 @@ namespace CRMagazine
         {
             if (txtOS.Text.Length > 0)
             {
-                txtCodVarejo.Text = txtCodVarejo.Text.TrimStart('0');
+                if(chbManterOsZeros.Checked == false)
+                {
+                    txtCodVarejo.Text = txtCodVarejo.Text.TrimStart('0');
+                }                
                 consulta.ConsultarCodVarejo(txtCodVarejo.Text, cboVarejista.Text);
                 if (consulta.Retorno == "ok")
                 {
@@ -787,16 +850,16 @@ namespace CRMagazine
                 consulta.PlayFail();
                 MessageBox.Show("OS CAMPOS OBRIGATÓRIOS DEVEM ESTAR PREENCHIDOS.");
             }
-            else if (txtOS.Text.Length < 8 && (cboVarejista.Text == "VIAVAREJO" || cboVarejista.Text == "CNOVA" || cboVarejista.Text == "MAGAZINE"))
-            {
-                consulta.PlayFail();
-                MessageBox.Show("VERIFIQUE A OS.");
-            }
             else if (txtOS.Text.Length < 11 && cboVarejista.Text == "MULTIVAREJO")
             {
                 consulta.PlayFail();
                 MessageBox.Show("VERIFIQUE A OS.");
-            }            
+            }
+            else if (txtOS.Text.Length < 8 && (cboVarejista.Text == "VIAVAREJO" || cboVarejista.Text == "CNOVA" || cboVarejista.Text == "MAGAZINE"))// || cboVarejista.SelectedValue.ToString() == "OS_PROPRIA"))
+            {
+                consulta.PlayFail();
+                MessageBox.Show("VERIFIQUE A OS.");
+            }                     
             else if (cboVarejista.Text.Length == 0)
             {
                 consulta.PlayFail();
@@ -845,8 +908,8 @@ namespace CRMagazine
                 consulta.consultarSimNao();
                 if (Convert.ToInt32(consulta.qntNaPosicao) > 0 || lblCT.Text == "10_1")
                 {
-                    Concluir();
-                    if (consulta.Retorno == "ok")
+                    int linhasAfetadas = Concluir();
+                    if (linhasAfetadas > 0)
                     {
 
                         //USAR ESSE DE EXEMPLO
@@ -877,7 +940,7 @@ namespace CRMagazine
 
 
                         //======Insere na tabela Historico==========================
-                        if (cboVarejista.Text == "VIAVAREJO" || cboVarejista.Text == "MULTIVAREJO" || cboVarejista.Text == "CNOVA" || cboVarejista.Text == "MAGAZINE")
+                        if (cboVarejista.SelectedValue.ToString() == "OS_PROPRIA")// || cboVarejista.Text == "VIAVAREJO" || cboVarejista.Text == "MULTIVAREJO" || cboVarejista.Text == "CNOVA" || cboVarejista.Text == "MAGAZINE")
                         {
                             string StatusHistorico = "ENTRADA";
                             consulta.DataAtual();
@@ -938,7 +1001,7 @@ namespace CRMagazine
             DateTime Mais30 = data_compra.AddDays(30);
             string DataMais30 = Mais30.ToString("dd/MM/yyyy");
 
-            imprimir.EtiquetaEntrada(txtOS.Text, consulta.dataNormal, DataMais30);
+            imprimir.EtiquetaEntrada(txtOS.Text, consulta.dataNormal, cboVarejista.Text, txtDescricao.Text);//, DataMais30);
 
             string codZPL = imprimir.s;
 
@@ -962,8 +1025,9 @@ namespace CRMagazine
 
         }
        
-        public void Concluir()
+        public int Concluir()
         {
+            int linhasAfetadas = 0;
             string DataGaiola = "";
             try
             {              
@@ -975,17 +1039,18 @@ namespace CRMagazine
             }
 
 
-            consulta.InsereNoBanco(txtOS.Text, txtCodVarejo.Text, txtDescricao.Text, txtSKU.Text, consulta.data, "REPARO", txtTipo.Text, cboVarejista.Text, txtNS.Text, cboFuncEst.Text + " / " + txtDefeitoRelatado.Text, txtFilial.Text, DataGaiola, lblCT.Text);
-            /*if (cboVarejista.Text == "VIAVAREJO" || cboVarejista.Text == "MULTIVAREJO" || cboVarejista.Text == "CNOVA" || cboVarejista.Text == "MAGAZINE")
+            //consulta.InsereNoBanco(txtOS.Text, txtCodVarejo.Text, txtDescricao.Text, txtSKU.Text, consulta.data, "REPARO", txtTipo.Text, cboVarejista.Text, txtNS.Text, cboFuncEst.Text + " / " + txtDefeitoRelatado.Text, txtFilial.Text, DataGaiola, lblCT.Text);
+            if (cboVarejista.SelectedValue.ToString() == "OS_PROPRIA")//(cboVarejista.Text == "VIAVAREJO" || cboVarejista.Text == "MULTIVAREJO" || cboVarejista.Text == "CNOVA" || cboVarejista.Text == "MAGAZINE")
             {
-                consulta.InsereNoBanco(txtOS.Text, txtCodVarejo.Text, txtDescricao.Text, txtSKU.Text, consulta.data, "REPARO", txtTipo.Text, cboVarejista.Text, txtNS.Text, cboFuncEst.Text + " / " + txtDefeitoRelatado.Text, txtFilial.Text, DataGaiola, lblCT.Text);
+                linhasAfetadas = consulta.InsereNoBanco(txtOS.Text, txtCodVarejo.Text, txtDescricao.Text, txtSKU.Text, consulta.data, "REPARO", txtTipo.Text, cboVarejista.Text, txtNS.Text, cboFuncEst.Text + " / " + txtDefeitoRelatado.Text, txtFilial.Text, DataGaiola, lblCT.Text);
             }
             else
             {
                 //SE FOR OUTROS VAREJISTAS VAI GERAR A OS AUTOMATICAMENTE
-                 consulta.InsereNoBancoOutros(txtCodVarejo.Text, txtDescricao.Text, txtSKU.Text, consulta.data, "REPARO", txtTipo.Text, cboVarejista.Text, txtNS.Text, cboFuncEst.Text + " / " + txtDefeitoRelatado.Text, txtFilial.Text, DataGaiola, lblCT.Text);
-            }*/
-            
+                linhasAfetadas = consulta.InsereNoBancoOutros(txtCodVarejo.Text, txtDescricao.Text, txtSKU.Text, consulta.data, "REPARO", txtTipo.Text, cboVarejista.Text, txtNS.Text, cboFuncEst.Text + " / " + txtDefeitoRelatado.Text, txtFilial.Text, DataGaiola, lblCT.Text);
+            }
+
+            return linhasAfetadas;
            
 
 
@@ -1172,10 +1237,10 @@ namespace CRMagazine
             consulta.LimparControles(this);
             ContadorDeProducao();
             txtOS.Select();
-            /*if (cboVarejista.Text != "VIAVAREJO" && cboVarejista.Text != "CNOVA" && cboVarejista.Text != "MULTIVAREJO" && cboVarejista.Text != "MAGAZINE")
+            if (cboVarejista.SelectedValue.ToString() != "OS_PROPRIA") //(cboVarejista.Text != "VIAVAREJO" && cboVarejista.Text != "CNOVA" && cboVarejista.Text != "MULTIVAREJO" && cboVarejista.Text != "MAGAZINE")
             {
-                txtOS.Text = "JBINFO";
-            }*/
+                txtOS.Text = "BSOFT";
+            }
         }
 
 
@@ -1657,21 +1722,7 @@ namespace CRMagazine
             }
         }
 
-        private void cboVarejista_SelectedValueChanged(object sender, EventArgs e)
-        {
-            /*if (cboVarejista.Text != "VIAVAREJO" && cboVarejista.Text != "CNOVA" && cboVarejista.Text != "MULTIVAREJO" && cboVarejista.Text != "MAGAZINE")
-            {
-                txtOS.Text = "JBINFO";
-                txtOS.Select();
-            }
-            else
-            {
-                txtOS.Text = "";
-                txtOS.Select();
-            }*/
-            txtOS.Text = "";
-            txtOS.Select();
-        }
+        
 
         
 
